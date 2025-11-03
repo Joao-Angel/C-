@@ -1,0 +1,136 @@
+#include <iostream>
+using namespace std;
+
+struct No {
+    int dado;
+    No* anterior;
+    No* proximo;
+
+    No(int valor) : dado(valor), anterior(nullptr), proximo(nullptr) {}
+};
+
+struct Lista {
+    No* inicio;
+    No* fim;
+
+    Lista() : inicio(nullptr), fim(nullptr) {}
+};
+
+void inserirOrdenado(Lista& lista, int valor) {
+    No* novoNo = new No(valor);
+    
+    if (!novoNo) {
+        return; 
+    }
+
+    if (lista.inicio == nullptr) {
+        lista.inicio = novoNo;
+        lista.fim = novoNo;
+        return;
+    }
+
+    if (valor <= lista.inicio->dado) {
+        novoNo->proximo = lista.inicio;
+        lista.inicio->anterior = novoNo;
+        lista.inicio = novoNo;
+        return;
+    }
+
+    No* atual = lista.inicio;
+
+    while (atual->proximo != nullptr && atual->proximo->dado < valor) {
+        atual = atual->proximo;
+    }
+
+    No* proximoNo = atual->proximo; 
+
+    novoNo->proximo = proximoNo;
+    novoNo->anterior = atual;
+    atual->proximo = novoNo;
+
+    if (proximoNo != nullptr) {
+        proximoNo->anterior = novoNo;
+    } else {
+        lista.fim = novoNo;
+    }
+}
+
+void exibirLista(const Lista& lista) {
+    cout << "Lista (->): ";
+    No* atual = lista.inicio;
+    while (atual != nullptr) {
+        cout << atual->dado << " ";
+        atual = atual->proximo;
+    }
+    cout << endl;
+}
+
+void exibirListaReversa(const Lista& lista) {
+    cout << "Lista (<-): ";
+    No* atual = lista.fim;
+    while (atual != nullptr) {
+        cout << atual->dado << " ";
+        atual = atual->anterior;
+    }
+    cout << endl;
+}
+
+void destruirLista(Lista& lista) {
+    No* atual = lista.inicio;
+    while (atual != nullptr) {
+        No* prox = atual->proximo;
+        delete atual;
+        atual = prox;
+    }
+    lista.inicio = lista.fim = nullptr;
+}
+
+int main() {
+    Lista minhaLista;
+
+    cout << "Inserindo 20...\n";
+    inserirOrdenado(minhaLista, 20); 
+    exibirLista(minhaLista);
+    exibirListaReversa(minhaLista);
+    cout << "--------------------\n";
+
+    cout << "Inserindo 10...\n";
+    inserirOrdenado(minhaLista, 10); 
+    exibirLista(minhaLista);
+    exibirListaReversa(minhaLista);
+    cout << "--------------------\n";
+
+    cout << "Inserindo 40...\n";
+    inserirOrdenado(minhaLista, 40); 
+    exibirLista(minhaLista);
+    exibirListaReversa(minhaLista);
+    cout << "--------------------\n";
+
+    cout << "Inserindo 30...\n";
+    inserirOrdenado(minhaLista, 30); 
+    exibirLista(minhaLista);
+    exibirListaReversa(minhaLista);
+    cout << "--------------------\n";
+
+    cout << "Inserindo 5...\n";
+    inserirOrdenado(minhaLista, 5);  
+    exibirLista(minhaLista);
+    exibirListaReversa(minhaLista);
+    cout << "--------------------\n";
+
+    cout << "Inserindo 45...\n";
+    inserirOrdenado(minhaLista, 45); 
+    exibirLista(minhaLista);
+    exibirListaReversa(minhaLista);
+    cout << "--------------------\n";
+
+    cout << "Inserindo 20 (duplicado)...\n";
+    inserirOrdenado(minhaLista, 20); 
+    exibirLista(minhaLista);
+    exibirListaReversa(minhaLista);
+    cout << "--------------------\n";
+
+    destruirLista(minhaLista);
+
+    return 0;
+}
