@@ -1,0 +1,160 @@
+#include <iostream>
+using namespace std;
+
+struct No {
+    int dado;
+    No* anterior;
+    No* proximo;
+
+    No(int valor) : dado(valor), anterior(nullptr), proximo(nullptr) {}
+};
+
+struct Lista {
+    No* inicio;
+    No* fim;
+
+    Lista() : inicio(nullptr), fim(nullptr) {}
+};
+
+void inserirOrdenado(Lista& lista, int valor) {
+    No* novoNo = new No(valor);
+    
+    if (!novoNo) {
+        return; 
+    }
+
+    if (lista.inicio == nullptr) {
+        lista.inicio = novoNo;
+        lista.fim = novoNo;
+        return;
+    }
+
+    if (valor <= lista.inicio->dado) {
+        novoNo->proximo = lista.inicio;
+        lista.inicio->anterior = novoNo;
+        lista.inicio = novoNo;
+        return;
+    }
+
+    No* atual = lista.inicio;
+
+    while (atual->proximo != nullptr && atual->proximo->dado < valor) {
+        atual = atual->proximo;
+    }
+
+    No* proximoNo = atual->proximo; 
+
+    novoNo->proximo = proximoNo;
+    novoNo->anterior = atual;
+    atual->proximo = novoNo;
+
+    if (proximoNo != nullptr) {
+        proximoNo->anterior = novoNo;
+    } else {
+        lista.fim = novoNo;
+    }
+}
+
+// --- Função Solicitada ---
+void removerTodos(Lista& lista, int valor) {
+    No* atual = lista.inicio;
+    No* proximoNo = nullptr;
+
+    while (atual != nullptr) {
+        proximoNo = atual->proximo;
+
+        if (atual->dado == valor) {
+            No* anteriorNo = atual->anterior;
+
+            if (anteriorNo == nullptr) {
+                lista.inicio = proximoNo;
+            } else {
+                anteriorNo->proximo = proximoNo;
+            }
+
+            if (proximoNo == nullptr) {
+                lista.fim = anteriorNo;
+            } else {
+                proximoNo->anterior = anteriorNo;
+            }
+
+            delete atual;
+        }
+        
+        atual = proximoNo;
+    }
+}
+
+
+// --- Funções Auxiliares ---
+
+void exibirLista(const Lista& lista) {
+    cout << "Lista (->): ";
+    No* atual = lista.inicio;
+    while (atual != nullptr) {
+        cout << atual->dado << " ";
+        atual = atual->proximo;
+    }
+    cout << endl;
+}
+
+void destruirLista(Lista& lista) {
+    No* atual = lista.inicio;
+    while (atual != nullptr) {
+        No* prox = atual->proximo;
+        delete atual;
+        atual = prox;
+    }
+    lista.inicio = lista.fim = nullptr;
+}
+
+// --- Função Principal (Testando removerTodos) ---
+
+int main() {
+    Lista minhaLista;
+    
+    inserirOrdenado(minhaLista, 10);
+    inserirOrdenado(minhaLista, 20);
+    inserirOrdenado(minhaLista, 20);
+    inserirOrdenado(minhaLista, 30);
+    inserirOrdenado(minhaLista, 40);
+    inserirOrdenado(minhaLista, 40);
+    inserirOrdenado(minhaLista, 50);
+    
+    cout << "Lista original:" << endl;
+    exibirLista(minhaLista);
+    cout << "--------------------\n";
+    
+    cout << "Removendo todos os 20...\n";
+    removerTodos(minhaLista, 20);
+    exibirLista(minhaLista);
+    cout << "--------------------\n";
+
+    cout << "Removendo todos os 40...\n";
+    removerTodos(minhaLista, 40);
+    exibirLista(minhaLista);
+    cout << "--------------------\n";
+
+    cout << "Removendo 10 (inicio)...\n";
+    removerTodos(minhaLista, 10);
+    exibirLista(minhaLista);
+    cout << "--------------------\n";
+
+    cout << "Removendo 50 (fim)...\n";
+    removerTodos(minhaLista, 50);
+    exibirLista(minhaLista);
+    cout << "--------------------\n";
+    
+    cout << "Removendo 30 (ultimo item)...\n";
+    removerTodos(minhaLista, 30);
+    exibirLista(minhaLista);
+    cout << "--------------------\n";
+
+    cout << "Tentando remover de lista vazia...\n";
+    removerTodos(minhaLista, 10);
+    exibirLista(minhaLista);
+    cout << "--------------------\n";
+
+    destruirLista(minhaLista);
+    return 0;
+}
